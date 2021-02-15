@@ -41,7 +41,7 @@ const triColorMix = {
   `
 }
 
-export function Effects() {
+const Effects = React.memo(function Effects() {
   const composer = useRef()
   const savePass = useRef()
   const blendPass = useRef()
@@ -79,4 +79,6 @@ export function Effects() {
       <shaderPass attachArray="passes" args={[CopyShader]} />
     </effectComposer>
   )
-}
+})
+
+export {Effects}

@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
 }
 
 code {
@@ -13,5 +14,21 @@ code {
 }
 
 #root, canvas {
-  min-height: 100vh;
+  height: 100vh;
 }
+
+ body {
+}
+
+ .progress-bar {
+   position: fixed;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   height: 5px;
+ }
+
+ .progress-bar__line {
+   background: #ce0737;
+   height: 100%;
+ }
