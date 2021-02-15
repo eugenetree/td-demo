@@ -4,6 +4,7 @@ import {Canvas, useFrame} from 'react-three-fiber'
 import {animated, useSpring} from 'react-spring'
 import {ResizeObserver} from '@juggle/resize-observer'
 import * as THREE from 'three'
+import * as easings from 'd3-ease'
 
 function Model(props) {
   const group = useRef()
@@ -74,21 +75,28 @@ function Dots({ticksSpring, clickSpring, duration, ...props}) {
 export default function App() {
   const canvas = useRef()
   const [activeScreen, setActiveScreen] = useState(0)
+  const [progressIsEnough, setProgressIsEnough] = useState(false)
   const [progressPercent, setProgressPercent] = useState(0)
   const [ticks, setTicks] = useState(0)
   const [rotateFreq, setRotateFreq] = useState(.01)
   const [logoScale, setLogoScale] = useState(.03)
 
+  const dragCanvas = useSpring({
+    top: activeScreen === 1 ? '0%' : '100%',
+    opacity: activeScreen === 1 ? 1 : 0,
+    config: {precision: .001, tension: 10, friction: 10, duration: 1500, easing: easings.easeExpOut, clamp: true}
+  })
+
   const {logoSpring} = useSpring({
-    logoSpring: ticks % 2 === 1 ? .02 : logoScale,
+    logoSpring: ticks % 2 === 1 ? .01 : logoScale,
     config: {precision: .001, tension: 10, friction: 10, clamp: true}
   })
 
   const {ticksSpring, clickSpring, rotateSpring} = useSpring({
     onFrame: ({clickSpring}) => {
-      if (activeScreen !== 0) return
-      if (clickSpring > .75) setActiveScreen(1)
+      if (progressIsEnough) return
       setProgressPercent(clickSpring)
+      if (clickSpring > .75) setProgressIsEnough(true)
     },
     ticksSpring: ticks, // Springy tick value (each click / release is a tick)
     clickSpring: ticks % 2 === 1 ? 1 : 0, // Springy click factor (1 means clicked, 0 means released)
@@ -105,9 +113,12 @@ export default function App() {
       if (ticks % 2 === 1) {
         if (clickSpring.value > 0.75) {
           setTimeout(() => {
-            setRotateFreq(.1)
-            setLogoScale(.5)
+            setRotateFreq(.01)
+            setLogoScale(1)
           }, 300)
+
+          setTimeout(() => setActiveScreen(1), 1000)
+
           setTicks(ticks + 1)
         } else setTicks(ticks - 1)
       }
@@ -118,6 +129,7 @@ export default function App() {
     count: 0,
     lastClickedTime: +new Date()
   })
+
   const handleClick = e => {
     const clicks = clicksInRow.current
     const currentTime = +new Date()
@@ -180,20 +192,27 @@ export default function App() {
         </Suspense>
       </Canvas>
 
-      <Canvas style={{
-        position: 'fixed',
-        top: '100%',
-        left: 0,
-        right: 0
-      }}
-        resize={{polyfill: ResizeObserver}}
+      <animated.div
+        className="drag-canvas"
+        style={{
+          background: 'black',
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          ...dragCanvas
+        }}
       >
-      </Canvas>
+        <Canvas style={{}}
+                resize={{polyfill: ResizeObserver}}
+        >
+        </Canvas>
+      </animated.div>
+
 
       <div className="progress-bar">
         <animated.div
           className="progress-bar__line"
-          style={{width: activeScreen === 0 ? progressPercent * 133 + '%' : '100%'}}
+          style={{width: progressIsEnough ? '100%' : progressPercent * 133 + '%'}}
         />
       </div>
     </div>
