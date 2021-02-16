@@ -1,5 +1,5 @@
 import {useGLTF} from "@react-three/drei";
-import React, {useMemo, useRef, useState, Suspense} from 'react'
+import React, {useMemo, useRef, useState, Suspense, useEffect} from 'react'
 import {Canvas, useFrame} from 'react-three-fiber'
 import {animated, useSpring} from 'react-spring'
 import {ResizeObserver} from '@juggle/resize-observer'
@@ -11,7 +11,7 @@ function Model(props) {
   const {nodes, materials} = useGLTF('/scene.glb')
   useFrame(() => {
     const scale = props.logoSpring.value
-
+    console.log(scale)
     group.current.scale.x = scale
     group.current.scale.y = scale
     group.current.scale.z = scale
@@ -21,7 +21,9 @@ function Model(props) {
 
   return (
     <group ref={group} {...props} dispose={null}>
-      <mesh material={materials.wire_088144225} geometry={nodes.Tube008.geometry}/>
+      <mesh material={materials.wire_088144225} geometry={nodes.Tube008.geometry}>
+        <meshStandardMaterial color='#ce0737' args={['color']}/>
+      </mesh>
     </group>
   )
 }
@@ -88,8 +90,8 @@ export default function App() {
   })
 
   const {logoSpring} = useSpring({
-    logoSpring: ticks % 2 === 1 ? .01 : logoScale,
-    config: {precision: .001, tension: 10, friction: 10, clamp: true}
+    logoSpring: ticks % 2 === 1 ? .02 : logoScale,
+    config: {precision: .001, tension: 10, friction: 10, clamp: true, duration: 2500}
   })
 
   const {ticksSpring, clickSpring, rotateSpring} = useSpring({
@@ -101,7 +103,7 @@ export default function App() {
     ticksSpring: ticks, // Springy tick value (each click / release is a tick)
     clickSpring: ticks % 2 === 1 ? 1 : 0, // Springy click factor (1 means clicked, 0 means released)
     rotateSpring: ticks % 2 === 1 ? .01 : rotateFreq,
-    config: {tension: 10, friction: 10, clamp: true}
+    config: {tension: 10, friction: 10}
   })
 
   const bind = {
