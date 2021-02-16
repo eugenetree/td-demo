@@ -1,34 +1,126 @@
+@import url("https://fonts.googleapis.com/css?family=Abril+Fatface&display=swap");
+
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
 #root, canvas {
-  height: 100vh;
+    height: 100vh;
 }
 
- body {
+body {
+    background: black;
 }
 
- .progress-bar {
-   position: fixed;
-   bottom: 0;
-   left: 0;
-   right: 0;
-   height: 5px;
- }
+.progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    transition: .3s;
+}
 
- .progress-bar__line {
-   background: #ce0737;
-   height: 100%;
- }
+.progress-bar--hidden {
+    height: 0;
+}
+
+.progress-bar__line {
+    background: #ce0737;
+    height: 100%;
+}
+
+.init-screen {
+
+}
+
+.ready-alert {
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+    color: #d2d2d2;
+    opacity: 0;
+    background: #9f062a;
+    padding: 5px 10px;
+    user-select: none;
+}
+
+.ready-alert--blinking {
+    animation: 2s ease-in-out 1s infinite blinking;
+}
+
+@keyframes blinking {
+    0%, 100% {
+        opacity: 0;
+    }
+
+    25%, 75% {
+        opacity: 1;
+    }
+}
+
+.game-screen {
+    position: fixed;
+    background: black;
+    left: 0;
+    right: 0;
+}
+
+
+/* /////////////////////////// */
+
+
+body {
+    font-family: "Abril Fatface", cursive;
+    margin: 0;
+    overflow: hidden;
+}
+
+#stage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.mainNav {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+    z-index: 10;
+
+    pointer-events: none;
+}
+
+.mainNav__list {
+    list-style: none;
+    text-align: center;
+    padding-left: 0;
+    margin: 0;
+}
+
+.mainNav__el:not(:last-child) {
+    margin-bottom: 50px;
+}
+
+.mainNav__link {
+    display: inline-block;
+    font-size: 170px;
+    text-decoration: none;
+    opacity: 0;
+    line-height: 0.8;
+}
