@@ -6,10 +6,12 @@ import Menu from "./Menu";
 const distance = 15;
 
 export default class Scene {
-  constructor() {
+  constructor({onGameStop}) {
     this.$container = document.getElementById("stage");
     this.W = window.innerWidth;
     this.H = window.innerHeight;
+
+    this.onGameStop = onGameStop
 
     this.setup();
     this.bindEvents();
@@ -58,7 +60,6 @@ export default class Scene {
 
   setCamera() {
     const aspect = this.W / this.H;
-
     this.camera = new THREE.OrthographicCamera(
       -distance * aspect,
       distance * aspect,
@@ -86,7 +87,7 @@ export default class Scene {
 
   // Actions
   addObjects() {
-    this.menu = new Menu(this.scene, this.world, this.camera);
+    this.menu = new Menu(this.scene, this.world, this.camera, this.onGameStop);
   }
 
   // Loop

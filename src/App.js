@@ -4,7 +4,6 @@ import {Canvas, useFrame} from 'react-three-fiber'
 import {animated, useSpring} from 'react-spring'
 import {ResizeObserver} from '@juggle/resize-observer'
 import * as THREE from 'three'
-import * as easings from 'd3-ease'
 import {Game} from './Game'
 
 function Model(props) {
@@ -85,10 +84,8 @@ export default function App() {
 
   const initScreenSpringProps = useSpring({
     opacity: activeScreen === 1 ? 0 : 1,
-    config: {duration: 2500}
+    config: {duration: 1500}
   })
-
-
 
   const {logoSpring} = useSpring({
     logoSpring: ticks % 2 === 1 ? .02 : logoScale,
@@ -108,11 +105,11 @@ export default function App() {
     config: {precision: .001, tension: 10, friction: 10}
   })
 
-  const handlePointerUp = e => {
+  const handlePointerDown = e => {
     setTicks(ticks + 1)
   }
 
-  const handlePointerDown = e => {
+  const handlePointerUp = e => {
     if (ticks % 2 === 1) {
       if (clickSpring.value > 0.75) {
         setTimeout(() => {
@@ -152,8 +149,8 @@ export default function App() {
 
   return (
     <div
-      onTouchStart={handlePointerUp}
-      onTouchEnd={handlePointerDown}
+      onTouchStart={handlePointerDown}
+      onTouchEnd={handlePointerUp}
     >
       <animated.div
         style={initScreenSpringProps}
@@ -187,7 +184,8 @@ export default function App() {
         </Canvas>
       </animated.div>
 
-      {activeScreen === 1 && <Game/>}
+      {/*{activeScreen === 1 && <Game/>}*/}
+      {true && <Game/>}
 
       {/*<animated.div*/}
       {/*  className="game-screen"*/}

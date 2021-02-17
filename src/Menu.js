@@ -6,13 +6,14 @@ const fontURL = "fonts/helvetiker.typeface.json";
 const margin = 6;
 const totalMass = .1;
 
-const force = 3;
+const force = 6;
 
 export default class Menu {
-  constructor(scene, world, camera) {
+  constructor(scene, world, camera, onGameStop) {
     // DOM elements
     this.$navItems = document.querySelectorAll(".mainNav a");
 
+    this.onGameStop = onGameStop
     // Three components
     this.scene = scene;
     this.world = world;
@@ -28,17 +29,52 @@ export default class Menu {
     this.raycaster = new THREE.Raycaster();
 
     this.loader.load(fontURL, f => {
-      this.setup(f);
+      this.setup(f)
+
+      // setTimeout(() => {
+      //   this.onGameStop()
+      // }, 3000)
+
+      function getCenterPoint(mesh) {
+        var geometry = mesh.geometry;
+        geometry.computeBoundingBox();
+        var center = new THREE.Vector3();
+        geometry.boundingBox.getCenter( center );
+        mesh.localToWorld( center );
+        return center;
+      }
+
+      const interval = setInterval(() => {
+        var frustum = new THREE.Frustum();
+        var cameraViewProjectionMatrix = new THREE.Matrix4();
+
+
+        this.camera.updateMatrixWorld(); // make sure the camera matrix is updated
+        this.camera.matrixWorldInverse.getInverse(this.camera.matrixWorld);
+        cameraViewProjectionMatrix.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
+        frustum.setFromMatrix(cameraViewProjectionMatrix);
+
+        const someLettersInViewport = this.words.some(word => {
+          // console.log(getCenterPoint(word.children[1]))
+          // return word.children.some(letter => frustum.intersectsObject(letter))
+          return word.children.some(letter => frustum.containsPoint(getCenterPoint(letter)))
+        })
+
+        if (!someLettersInViewport) {
+          this.onGameStop()
+          clearInterval(interval)
+        }
+      }, 1000)
     });
 
     this.bindEvents();
   }
 
   bindEvents() {
-    document.addEventListener("click", () => {
+    document.querySelector('#stage').addEventListener("click", () => {
       this.onClick();
     });
-    window.addEventListener("mousemove", e => {
+    document.querySelector('#stage').addEventListener("mousemove", e => {
       this.onMouseMove(e);
     });
   }
@@ -59,7 +95,7 @@ export default class Menu {
     Array.from(this.$navItems)
       .reverse()
       .forEach(($item, i) => {
-        const { innerText } = $item;
+        const {innerText} = $item;
 
         const words = new THREE.Group();
         words.letterOff = 0;
@@ -73,13 +109,15 @@ export default class Menu {
         this.world.addBody(words.ground);
 
         Array.from(innerText).forEach((letter, j) => {
-          const material = new THREE.MeshPhongMaterial({ color: '#ce0737' });
+          const material = new THREE.MeshPhongMaterial({color: '#ce0737'});
           const geometry = new THREE.TextBufferGeometry(letter, fontOption);
 
           geometry.computeBoundingBox();
           geometry.computeBoundingSphere();
 
+
           const mesh = new THREE.Mesh(geometry, material);
+
           // Get size
           mesh.size = mesh.geometry.boundingBox.getSize(new THREE.Vector3());
 
@@ -95,14 +133,13 @@ export default class Menu {
           const centerIdx = Math.floor(this.$navItems.length / 2)
 
 
-
           mesh.body = new C.Body({
             mass: totalMass / innerText.length,
             position: new C.Vec3(words.letterOff, 0, (i - centerIdx) * 7)
           });
 
           // Add the shape to the body and offset it to the center of our mesh
-          const { center } = mesh.geometry.boundingSphere;
+          const {center} = mesh.geometry.boundingSphere;
           mesh.body.addShape(box, new C.Vec3(center.x, center.y, center.z));
 
           this.world.addBody(mesh.body);
@@ -118,7 +155,7 @@ export default class Menu {
         this.scene.add(words);
       });
 
-    this.setConstraints();
+    // this.setConstraints();
   }
 
   update() {
@@ -175,7 +212,7 @@ export default class Menu {
 
     if (intersects.length > 0) {
       const obj = intersects[0];
-      const { object, face } = obj;
+      const {object, face} = obj;
 
       if (!object.isMesh) return;
 
@@ -184,7 +221,7 @@ export default class Menu {
 
       this.words.forEach(word => {
         word.children.forEach(letter => {
-          const { body } = letter;
+          const {body} = letter;
 
           if (letter !== object) return;
 
