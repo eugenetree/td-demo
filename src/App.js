@@ -179,7 +179,7 @@ export default function App() {
         </Canvas>
       </animated.div>
 
-      {activeScreen === 1 && <Game/>}
+      {activeScreen === 1 && <Game onExit={() => {}}/>}
       {/*{true && <Game/>}*/}
 
       {/*<animated.div*/}

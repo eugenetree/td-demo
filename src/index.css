@@ -101,6 +101,7 @@ body {
 }
 
 .game-menu {
+    position: relative;
     width: 70%;
     height: 70%;
     background: rgba(0, 0, 0, .4);
@@ -110,6 +111,14 @@ body {
     justify-content: center;
     align-items: center;
     border: 10px solid white;
+}
+
+.game-menu__exit {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    color: white;
+    font-size: 25px;
 }
 
 .game-menu__list {
@@ -161,9 +170,12 @@ body {
 }
 
 .leaderboard {
+    width: 50%;
     color: white;
-    max-height: 96px;
+    max-height: 116px;
     overflow-y: auto;
+    border: 1px solid white;
+    padding: 10px;
 }
 
 /* /////////////////////////// */

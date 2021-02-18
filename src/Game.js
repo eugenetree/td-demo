@@ -4,7 +4,7 @@ import React, {useRef, useEffect, useState} from 'react';
 import * as easings from 'd3-ease';
 import Scene from './Scene'
 
-const Game = () => {
+const Game = ({onExit}) => {
   const [isVisible, setIsVisible] = useState(true)
   const [clock, setClock] = useState()
   const [activeInterface, setActiveInterface] = useState('init') // null || 'init' || 'countdown' || 'saving-result'
@@ -119,6 +119,8 @@ const Game = () => {
         {activeInterface !== null && (
           <div className="game-menu-wrap">
             <div className="game-menu">
+              <div className="game-menu__exit" onClick={onExit}>exit</div>
+
               {activeInterface === 'init' && (
                 <>
                   <div className="game-menu__list">

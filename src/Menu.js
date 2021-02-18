@@ -2,7 +2,7 @@ import * as THREE from "three";
 import C from "cannon";
 
 // CONSTANTS
-const fontURL = "fonts/helvetiker.typeface.json";
+const fontURL = "fonts/pixel.json";
 const margin = 6;
 const totalMass = .1;
 
@@ -98,9 +98,9 @@ export default class Menu {
       font: f,
       size: 3,
       height: 0.4,
-      curveSegments: 24,
+      curveSegments: 4,
       bevelEnabled: true,
-      bevelThickness: 0.9,
+      bevelThickness: .9,
       bevelSize: 0.3,
       bevelOffset: 0,
       bevelSegments: 10
