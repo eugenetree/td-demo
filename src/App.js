@@ -74,7 +74,6 @@ function Dots({ticksSpring, clickSpring, duration, ...props}) {
 }
 
 export default function App() {
-  const gameScreenRef = useRef()
   const [activeScreen, setActiveScreen] = useState(0)
   const [progressIsEnough, setProgressIsEnough] = useState(false)
   const [progressPercent, setProgressPercent] = useState(0)
@@ -96,7 +95,7 @@ export default function App() {
     onFrame: ({clickSpring}) => {
       if (progressIsEnough) return
       setProgressPercent(clickSpring)
-      if (clickSpring > .75) setProgressIsEnough(true)
+      if (clickSpring > .75) setTimeout(() => setProgressIsEnough(true), 1500)
     },
 
     ticksSpring: ticks, // Springy tick value (each click / release is a tick)
@@ -110,18 +109,16 @@ export default function App() {
   }
 
   const handlePointerUp = e => {
-    if (ticks % 2 === 1) {
-      if (clickSpring.value > 0.75) {
-        setTimeout(() => {
-          setRotateFreq(.01)
-          setLogoScale(1)
-        }, 300)
+    if (clickSpring.value > 0.75) {
+      setTimeout(() => {
+        setRotateFreq(.01)
+        setLogoScale(1)
+      }, 300)
 
-        setTimeout(() => setActiveScreen(1), 1000)
+      setTimeout(() => setActiveScreen(1), 1000)
 
-        setTicks(ticks + 1)
-      } else setTicks(ticks - 1)
-    }
+      setTicks(ticks + 1)
+    } else setTicks(ticks - 1)
   }
 
   const clicksInRow = useRef({
@@ -162,8 +159,6 @@ export default function App() {
           colorManagement={false}
           camera={{position: [0, 0, 100], zoom: 15}}
           resize={{polyfill: ResizeObserver}}  // Allows @react-spring/three to work in Safari
-          onPointerUp={handlePointerUp}
-          onPointerDown={handlePointerDown}
         >
           <pointLight position={[0, 0, 100]}/>
           <color attach="background" args={['black']}/>
@@ -184,8 +179,8 @@ export default function App() {
         </Canvas>
       </animated.div>
 
-      {/*{activeScreen === 1 && <Game/>}*/}
-      {true && <Game/>}
+      {activeScreen === 1 && <Game/>}
+      {/*{true && <Game/>}*/}
 
       {/*<animated.div*/}
       {/*  className="game-screen"*/}

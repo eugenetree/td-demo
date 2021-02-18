@@ -5,16 +5,17 @@ import * as easings from 'd3-ease';
 import Scene from './Scene'
 
 const Game = () => {
+  const [isVisible, setIsVisible] = useState(true)
   const [clock, setClock] = useState()
   const [activeInterface, setActiveInterface] = useState('init') // null || 'init' || 'countdown' || 'saving-result'
 
   const [leaderboard, setLeaderboard] = useState(JSON.parse(localStorage.getItem('leaderboard')) || {})
-  const [nickname, setNickname] = useState('')
 
   const gameStartDate = useRef()
   const clockInterval = useRef()
   const [countdown, setCountdown] = useState(3)
   const [game, setGame] = useState(null)
+  const [gameIsLoaded, setGameIsLoaded] = useState(false)
   const saveResultInput = useRef()
 
   const canvasRef = useRef()
@@ -32,7 +33,10 @@ const Game = () => {
     setActiveInterface('countdown')
     const interval = setInterval(() => {
       setCountdown(prev => {
-        if (prev - 1 === 0) clearInterval(interval)
+        if (prev === 1) {
+          clearInterval(interval);
+          return prev
+        }
         return prev - 1
       })
     }, 1000)
@@ -51,125 +55,140 @@ const Game = () => {
 
   const saveResult = () => {
     const nickname = saveResultInput.current.value
+    if (leaderboard[nickname] !== undefined) {
+      alert('this name is already taken')
+      return
+    }
+
     const nextLeaderboard = {
       ...leaderboard,
       [nickname]: clock
     }
 
+    setGameIsLoaded(false)
     setLeaderboard(nextLeaderboard)
     localStorage.setItem('leaderboard', JSON.stringify(nextLeaderboard))
+    setActiveInterface('init')
+    setClock(null)
+    setTimeout(() => {
+      setGame(new Scene({onGameStop: stopGame, onGameLoad: () => setGameIsLoaded(true)}))
+    }, 1000)
   }
 
   useEffect(() => {
     setTimeout(() => {
-      setGame(new Scene({onGameStop: stopGame}))
+      setGame(new Scene({onGameStop: stopGame, onGameLoad: () => setGameIsLoaded(true)}))
     }, 1500)
   }, [])
 
   useEffect(() => {
-    if (countdown === 0) {
-      setActiveInterface(null)
-      gameStartDate.current = +new Date()
-      startClock()
+    if (countdown === 1) {
+      setTimeout(() => {
+        setActiveInterface(null)
+        gameStartDate.current = +new Date()
+        startClock()
+        setCountdown(3)
+      }, 1000)
     }
   }, [countdown])
 
   return (
-    <animated.div
-      className="game-screen"
-      style={canvasSpringProps}
-    >
-      <canvas
-        ref={canvasRef}
-        id="stage"
-      />
-      <nav className="mainNav">
-        <ul className="mainNav__list">
-          <li className="mainNav__el">
-            <a href="#" className="mainNav__link">toppeople</a>
-          </li>
-          <li className="mainNav__el">
-            <a href="#" className="mainNav__link">topgoals</a>
-          </li>
-          <li className="mainNav__el">
-            <a href="#" className="mainNav__link">topdevs</a>
-          </li>
-        </ul>
-      </nav>
+    isVisible && (
+      <animated.div
+        className="game-screen"
+        style={canvasSpringProps}
+      >
+        <canvas
+          ref={canvasRef}
+          id="stage"
+        />
+        <nav className="mainNav">
+          <ul className="mainNav__list">
+            <li className="mainNav__el">
+              <a href="#" className="mainNav__link">toppeople</a>
+            </li>
+            <li className="mainNav__el">
+              <a href="#" className="mainNav__link">topgoals</a>
+            </li>
+            <li className="mainNav__el">
+              <a href="#" className="mainNav__link">topdevs</a>
+            </li>
+          </ul>
+        </nav>
 
-      {activeInterface !== null && (
-        <div className="game-menu-wrap">
-          <div className="game-menu">
-            {activeInterface === 'init' && (
-              <>
-                <div className="game-menu__list">
+        {activeInterface !== null && (
+          <div className="game-menu-wrap">
+            <div className="game-menu">
+              {activeInterface === 'init' && (
+                <>
+                  <div className="game-menu__list">
+                    <div
+                      className="game-menu__list-item"
+                      onClick={startGame}
+                    >
+                      {gameIsLoaded ? 'start' : 'loading...'}
+                    </div>
+                  </div>
+                  <div className="leaderboard">
+                    {Object.entries(leaderboard).sort(([keyA, timeA], [keyB, timeB]) => +timeA - +timeB).map(([username, time]) => (
+                      <div>
+                        {username}: {time}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {activeInterface === 'countdown' && (
+                <div className="game-menu__countdown">
+                  {countdown}
+                </div>
+              )}
+
+              {activeInterface === 'saving-result' && (
+                <div className="save-result">
+                  <div className="save-result__title">
+                    nice try, bro. save your result <br/> {clock} seconds
+                  </div>
+                  <input
+                    className="save-result__input"
+                    type="text"
+                    placeholder="enter your nickname"
+                    ref={saveResultInput}
+                  />
                   <div
-                    className="game-menu__list-item"
-                    onClick={startGame}
+                    className="save-result__btn"
+                    onClick={saveResult}
                   >
-                    start
+                    save result
                   </div>
                 </div>
-                <div className="leaderboard">
-                  {Object.entries(leaderboard).map(([username, time]) => (
-                    <div>
-                      {username}: {time}
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+              )}
 
-            {activeInterface === 'countdown' && (
-              <div className="game-menu__countdown">
-                {countdown}
-              </div>
-            )}
+              {/*{activeInterface === 'end' && (*/}
+              {/*  <div className="result-panel">*/}
+              {/*    <div className="result-panel__clock">*/}
+              {/*      Your time: {clock}*/}
+              {/*    </div>*/}
 
-            {activeInterface === 'saving-result' && (
-              <div className="save-result">
-                <div className="save-result__title">
-                  nice try, bro. save your result <br/> {clock} seconds
-                </div>
-                <input
-                  className="save-result__input"
-                  type="text"
-                  placeholder="enter your nickname"
-                  ref={saveResultInput}
-                />
-                <div
-                  className="save-result__btn"
-                  onClick={saveResult}
-                >
-                  save result
-                </div>
-              </div>
-            )}
+              {/*    <div className="result-panel__leaderboard">*/}
+              {/*      <div className="result-panel__leaderboard-item">*/}
 
-            {/*{activeInterface === 'end' && (*/}
-            {/*  <div className="result-panel">*/}
-            {/*    <div className="result-panel__clock">*/}
-            {/*      Your time: {clock}*/}
-            {/*    </div>*/}
-
-            {/*    <div className="result-panel__leaderboard">*/}
-            {/*      <div className="result-panel__leaderboard-item">*/}
-
-            {/*      </div>*/}
-            {/*    </div>*/}
-            {/*  </div>*/}
-            {/*)}*/}
+              {/*      </div>*/}
+              {/*    </div>*/}
+              {/*  </div>*/}
+              {/*)}*/}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {clock && (
-        <div className="clock-panel">
-          {clock}
-        </div>
-      )}
-    </animated.div>
-  )
+        {clock && (
+          <div className="clock-panel">
+            {clock}
+          </div>
+        )}
+      </animated.div>
+    ))
 }
 
 export {

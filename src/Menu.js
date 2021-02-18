@@ -9,11 +9,13 @@ const totalMass = .1;
 const force = 6;
 
 export default class Menu {
-  constructor(scene, world, camera, onGameStop) {
+  constructor(scene, world, camera, onGameStop, onGameLoad) {
     // DOM elements
     this.$navItems = document.querySelectorAll(".mainNav a");
 
     this.onGameStop = onGameStop
+    this.onGameLoad = onGameLoad
+
     // Three components
     this.scene = scene;
     this.world = world;
@@ -30,10 +32,7 @@ export default class Menu {
 
     this.loader.load(fontURL, f => {
       this.setup(f)
-
-      // setTimeout(() => {
-      //   this.onGameStop()
-      // }, 3000)
+      this.onGameLoad()
 
       function getCenterPoint(mesh) {
         var geometry = mesh.geometry;
@@ -54,11 +53,26 @@ export default class Menu {
         cameraViewProjectionMatrix.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
         frustum.setFromMatrix(cameraViewProjectionMatrix);
 
+
         const someLettersInViewport = this.words.some(word => {
           // console.log(getCenterPoint(word.children[1]))
           // return word.children.some(letter => frustum.intersectsObject(letter))
-          return word.children.some(letter => frustum.containsPoint(getCenterPoint(letter)))
+          return word.children.some(letter => {
+            const letterCenter = getCenterPoint(letter)
+
+            // const letterIsOut = (letterCenter.x < this.camera.left + 5 || letterCenter.x > this.camera.right - 5 || letterCenter.y > this.camera.top - 5 || letterCenter.y < this.camera.bottom + 5)
+            // if (letterIsOut) {
+            //   // console.log('out')
+            //   // letter.material.color.setHex(0xff0000)
+            //   // letter.material.color = 'white'
+            //   // letter.material.needsUpdate = true
+            // }
+            // return !letterIsOut
+            // console.log(getCenterPoint(letter), this.camera.left, this.camera.right)
+            return frustum.containsPoint(getCenterPoint(letter))
+          })
         })
+
 
         if (!someLettersInViewport) {
           this.onGameStop()
@@ -154,8 +168,6 @@ export default class Menu {
         this.words.push(words);
         this.scene.add(words);
       });
-
-    // this.setConstraints();
   }
 
   update() {
@@ -173,30 +185,6 @@ export default class Menu {
 
   getOffsetY(i) {
     return (this.$navItems.length - i - 1) * margin - this.offset
-  }
-
-  setConstraints() {
-    this.words.forEach(word => {
-      for (let i = 0; i < word.children.length; i++) {
-        // We get the current letter and the next letter (if it's not the penultimate)
-        const letter = word.children[i];
-        const nextLetter =
-          i === word.children.length - 1 ? null : word.children[i + 1];
-
-        if (!nextLetter) continue;
-
-        // I choosed ConeTwistConstraint because it's more rigid that other constraints and it goes well for my purpose
-        const c = new C.ConeTwistConstraint(letter.body, nextLetter.body, {
-          pivotA: new C.Vec3(letter.size.x, 0, 0),
-          pivotB: new C.Vec3(0, 0, 0)
-        });
-
-        // Optionnal but it gives us a more realistic render in my opinion
-        c.collideConnected = true;
-
-        this.world.addConstraint(c);
-      }
-    });
   }
 
   onClick() {

@@ -6,12 +6,13 @@ import Menu from "./Menu";
 const distance = 15;
 
 export default class Scene {
-  constructor({onGameStop}) {
+  constructor({onGameStop, onGameLoad}) {
     this.$container = document.getElementById("stage");
     this.W = window.innerWidth;
     this.H = window.innerHeight;
 
     this.onGameStop = onGameStop
+    this.onGameLoad = onGameLoad
 
     this.setup();
     this.bindEvents();
@@ -87,7 +88,7 @@ export default class Scene {
 
   // Actions
   addObjects() {
-    this.menu = new Menu(this.scene, this.world, this.camera, this.onGameStop);
+    this.menu = new Menu(this.scene, this.world, this.camera, this.onGameStop, this.onGameLoad);
   }
 
   // Loop
