@@ -129,19 +129,23 @@ export default function App() {
   const handleClick = e => {
     const clicks = clicksInRow.current
     const currentTime = +new Date()
-    if (currentTime - clicks.lastClickedTime > 500) {
+    if (currentTime - clicks.lastClickedTime > 300) {
       clicksInRow.current = {
         count: 0,
         lastClickedTime: currentTime
       }
     } else {
       const nextCount = clicks.count + 1
-      if (nextCount === 2) window.location.reload()
+      if (nextCount === 5) window.location.reload()
       clicksInRow.current = {
         count: nextCount,
         lastClickedTime: currentTime
       }
     }
+  }
+
+  const handleGameOnExit = () => {
+    window.location.reload()
   }
 
   return (
@@ -179,7 +183,7 @@ export default function App() {
         </Canvas>
       </animated.div>
 
-      {activeScreen === 1 && <Game onExit={() => setActiveScreen(0)}/>}
+      {activeScreen === 1 && <Game onExit={handleGameOnExit}/>}
       {/*{true && <Game/>}*/}
 
       {/*<animated.div*/}
