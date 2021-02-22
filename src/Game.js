@@ -58,7 +58,7 @@ const Game = ({onExit}) => {
     if (leaderboard[nickname] !== undefined) {
       alert('this name is already taken')
       return
-    }
+    } else if (nickname === '') alert('enter name, please, at least 2 symbols')
 
     const nextLeaderboard = {
       ...leaderboard,
@@ -132,11 +132,11 @@ const Game = ({onExit}) => {
                     </div>
                   </div>
                   <div className="leaderboard">
-                    {Object.entries(leaderboard).sort(([keyA, timeA], [keyB, timeB]) => +timeA - +timeB).map(([username, time]) => (
+                    {Object.entries(leaderboard).length ? Object.entries(leaderboard).sort(([keyA, timeA], [keyB, timeB]) => +timeA - +timeB).map(([username, time]) => (
                       <div>
                         {username}: {time}
                       </div>
-                    ))}
+                    )) : 'No any results yet'}
                   </div>
                 </>
               )}
