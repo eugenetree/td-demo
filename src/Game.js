@@ -53,6 +53,14 @@ const Game = ({onExit}) => {
     }, 100)
   }
 
+  const resetLeaderboard = () => {
+    const password = prompt("Enter password")
+    if (password === 'TD2020') {
+      localStorage.removeItem('leaderboard')
+      setLeaderboard({})
+    }
+  }
+
   const saveResult = () => {
     const nickname = saveResultInput.current.value
     if (leaderboard[nickname] !== undefined) {
@@ -122,6 +130,7 @@ const Game = ({onExit}) => {
         {activeInterface !== null && (
           <div className="game-menu-wrap">
             <div className="game-menu">
+              {/* <div className="game-menu__reset" onClick={resetLeaderboard}>reset leaderboard</div> // TODO*/}
               <div className="game-menu__exit" onClick={onExit}>exit</div>
 
               {activeInterface === 'init' && (
