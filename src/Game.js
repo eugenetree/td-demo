@@ -58,7 +58,7 @@ const Game = ({onExit}) => {
     if (leaderboard[nickname] !== undefined) {
       alert('this name is already taken')
       return
-    } else if (nickname === '') {
+    } else if (nickname.length < 2) {
       alert('enter name, please, at least 2 symbols')
       return
     }
