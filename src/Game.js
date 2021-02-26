@@ -16,7 +16,9 @@ const Game = ({onExit}) => {
   const [countdown, setCountdown] = useState(3)
   const [game, setGame] = useState(null)
   const [gameIsLoaded, setGameIsLoaded] = useState(false)
+  const [gameIsGoing, setGameIsGoing] = useState(false)
   const saveResultInput = useRef()
+  const reloadGameTimeout = useRef()
 
   const canvasRef = useRef()
   const canvasSpringProps = useSpring({
@@ -43,6 +45,7 @@ const Game = ({onExit}) => {
   }
 
   const stopGame = () => {
+    setGameIsGoing(false)
     clearInterval(clockInterval.current)
     setActiveInterface('saving-result')
   }
@@ -59,6 +62,16 @@ const Game = ({onExit}) => {
       localStorage.removeItem('leaderboard')
       setLeaderboard({})
     } else alert ('incorrect pass')
+  }
+
+  const handleGameReloadTouchStart = () => {
+    reloadGameTimeout.current = setTimeout(() => {
+      window.location.reload()
+    }, 3000)
+  }
+
+  const handleGameReloadTouchEnd = () => {
+    clearInterval(reloadGameTimeout.current)
   }
 
   const saveResult = () => {
@@ -98,6 +111,7 @@ const Game = ({onExit}) => {
         setActiveInterface(null)
         gameStartDate.current = +new Date()
         startClock()
+        setGameIsGoing(true)
         setCountdown(3)
       }, 1000)
     }
@@ -116,16 +130,26 @@ const Game = ({onExit}) => {
         <nav className="mainNav">
           <ul className="mainNav__list">
             <li className="mainNav__el">
-              <a href="#" className="mainNav__link">toppeople</a>
+              <a href="#" className="mainNav__link">TOPPEOPLE</a>
             </li>
             <li className="mainNav__el">
-              <a href="#" className="mainNav__link">topgoals</a>
+              <a href="#" className="mainNav__link">TOPGOALS</a>
             </li>
             <li className="mainNav__el">
-              <a href="#" className="mainNav__link">topdevs</a>
+              <a href="#" className="mainNav__link">TOPDEVS</a>
             </li>
           </ul>
         </nav>
+
+        {gameIsGoing && (
+          <div
+            className="game-reload"
+            onTouchStart={handleGameReloadTouchStart}
+            onTouchEnd={handleGameReloadTouchEnd}
+          >
+            reload
+          </div>
+        )}
 
         {activeInterface !== null && (
           <div className="game-menu-wrap">
