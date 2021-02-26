@@ -162,7 +162,7 @@ const Game = ({onExit}) => {
                   <div className="game-menu__list">
                     <div
                       className="game-menu__list-item"
-                      onClick={startGame}
+                      onClick={() => gameIsLoaded && startGame()}
                     >
                       {gameIsLoaded ? 'start' : 'loading...'}
                     </div>
