@@ -121,6 +121,14 @@ body {
     font-size: 25px;
 }
 
+.game-menu__reset {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    color: white;
+    font-size: 25px;
+}
+
 .game-menu__list {
     display: grid;
     row-gap: 5px;

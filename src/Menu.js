@@ -6,7 +6,7 @@ const fontURL = "fonts/pixel.json";
 const margin = 6;
 const totalMass = .1;
 
-const force = 6;
+const force = 4;
 
 export default class Menu {
   constructor(scene, world, camera, onGameStop, onGameLoad) {
@@ -51,7 +51,7 @@ export default class Menu {
         this.camera.updateMatrixWorld(); // make sure the camera matrix is updated
         this.camera.matrixWorldInverse.getInverse(this.camera.matrixWorld);
         cameraViewProjectionMatrix.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
-        frustum.setFromMatrix(cameraViewProjectionMatrix);
+        frustum.setFromProjectionMatrix(cameraViewProjectionMatrix);
 
 
         const someLettersInViewport = this.words.some(word => {

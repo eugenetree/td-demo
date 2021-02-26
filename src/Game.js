@@ -58,7 +58,7 @@ const Game = ({onExit}) => {
     if (password === 'TD2020') {
       localStorage.removeItem('leaderboard')
       setLeaderboard({})
-    }
+    } else alert ('incorrect pass')
   }
 
   const saveResult = () => {
@@ -130,7 +130,7 @@ const Game = ({onExit}) => {
         {activeInterface !== null && (
           <div className="game-menu-wrap">
             <div className="game-menu">
-              {/* <div className="game-menu__reset" onClick={resetLeaderboard}>reset leaderboard</div> // TODO*/}
+              <div className="game-menu__reset" onClick={resetLeaderboard}>reset leaderboard</div>
               <div className="game-menu__exit" onClick={onExit}>exit</div>
 
               {activeInterface === 'init' && (
